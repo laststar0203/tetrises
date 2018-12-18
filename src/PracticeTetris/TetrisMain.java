@@ -32,82 +32,91 @@ public class TetrisMain extends Canvas implements Runnable, KeyListener {
 		frame.setLocationRelativeTo(null); // 윈도우 창을 가운데 화면에 띄우게 함
 		frame.setResizable(false); // 프레임의 크기를 사용자가 조정할수있을지 말지 결정하는 메소드
 		frame.setLayout(null);
-		
+
 		KeyGetter.loadKeys();
-		
+
 		JMenuBar bar = new JMenuBar();
 		bar.setBounds(0, 0, WIDTH - 10, 25);
 		JMenu file = new JMenu("file");
 		file.setBounds(0, 0, 45, 24);
-		
+
 		JMenuItem newGame = new JMenuItem("New Game");
 		newGame.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//Code for new Game
-				System.out.println("Starting new Game....");			
+				// Code for new Game
+				System.out.println("Starting new Game....");
 			}
 		});
-		
+
 		JMenuItem highScore = new JMenuItem("HighScore");
 		highScore.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//Code for new Game
+				// Code for new Game
 				int highscore = 0;
-				final JFrame alert = new JFrame("High Score"); //내부클래스에서 JFrame에 접근하기 위해 상수값으로 변경?!
+				final JFrame alert = new JFrame("High Score"); // 내부클래스에서 JFrame에 접근하기 위해 상수값으로 변경?!
 				alert.setSize(200, 150);
 				alert.setLayout(null);
 				alert.setLocationRelativeTo(null);
-				
-				JLabel score = new JLabel("The HighScore is: "+ highscore);
-				score.setBounds(0 , 0 ,200, 50);
-				
+
+				JLabel score = new JLabel("The HighScore is: " + highscore);
+				score.setBounds(0, 0, 200, 50);
+
 				JButton okayBtn = new JButton("Okay");
-				okayBtn.setBounds(50 , 80, 100, 30);
+				okayBtn.setBounds(50, 80, 100, 30);
 				okayBtn.addActionListener(new ActionListener() {
-					
+
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						// TODO Auto-generated method stub
 						alert.dispose();
 					}
 				});
-				
+
 				alert.add(score);
-				alert.add(okayBtn);				
+				alert.add(okayBtn);
 				alert.setResizable(false);
 				alert.setVisible(true);
-				
-				
-				//마이뇌피셜 : 하이스코어를 열때마다 이렇게 프레임을 새로 생성하기 보다는 미리 생성해놓고 점수 값만 업데이트 하고 setVisible 값을 바꿔주는 게 더 낮지 않을까?
+
+				// 마이뇌피셜 : 하이스코어를 열때마다 이렇게 프레임을 새로 생성하기 보다는 미리 생성해놓고 점수 값만 업데이트 하고 setVisible 값을
+				// 바꿔주는 게 더 낮지 않을까?
 			}
 		});
-		
-		JMenuItem exit = new JMenuItem("Exit");
-		exit.addActionListener(new ActionListener() {
-			
+
+		JMenuItem option = new JMenuItem("Option");
+		option.addActionListener(new ActionListener() {
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//Code for new Game
-				System.out.println("Closing....");			
+				// TODO Auto-generated method stub
+				Config.opneConfig(frame);
+			}
+		});
+
+		JMenuItem exit = new JMenuItem("Exit");
+		exit.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// Code for new Game
+				System.out.println("Closing....");
 				System.exit(0);
 			}
 		});
-		
-		
-		
+
 		TetrisMain main = new TetrisMain();
-		main.setBounds(0 , 25 , WIDTH , HEIGHT - 25);
+		main.setBounds(0, 25, WIDTH, HEIGHT - 25);
 		frame.add(main);
 		bar.add(file);
-		
+
 		file.add(newGame);
 		file.add(highScore);
+		file.add(option);
 		file.add(exit);
-		
+
 		frame.add(bar);
 		frame.setVisible(true);
 		main.start();
@@ -154,7 +163,6 @@ public class TetrisMain extends Canvas implements Runnable, KeyListener {
 		// Font설명 http://blog.naver.com/PostView.nhn?blogId=bestheroz&logNo=103808914
 
 		g.drawString("Tetris", 170, 50);
-		
 
 	}
 
