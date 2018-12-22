@@ -19,6 +19,8 @@ public class Shape {
 
 		private Tetrominose(int[][] coords) {
 			// TODO Auto-generated constructor stub
+			
+			
 			this.coords = coords;
 		}
 	}
@@ -48,11 +50,11 @@ public class Shape {
 		coords[index][1] = y;
 	}
 
-	private int x(int index) {
+	public int x(int index) {
 		return coords[index][0];
 	}
 
-	private int y(int index) {
+	public int y(int index) {
 		return coords[index][1];
 	}
 
