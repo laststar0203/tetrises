@@ -1,70 +1,148 @@
 package PracticeTetris;
 
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
-import javax.swing.JLabel;
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-import PracticeTetris.Shape.Tetrominose;
+public class Board extends JPanel implements KeyListener {
 
-public class Board extends JPanel implements ActionListener {
+	private BufferedImage blocks;
+	// https://m.blog.naver.com/PostView.nhn?blogId=seektruthyb&logNo=150114863254&proxyReferer=https%3A%2F%2Fwww.google.com%2F
 
-	private static final int BOARD_WIDTH = 10;
-	private static final int BOARD_HEIGHT = 22;
+	private final int blockSize = 30;
+
+	private final int boardWidth = 10, boardHeight = 20;
+
+	private int[][] board = new int[boardWidth][boardHeight];
+
+	private Shape[] shapes = new Shape[7];
+	
+	private Shape currentShape;
+	
 	private Timer timer;
-	private boolean isFallingFinished = false;
-	private boolean isStarted = false;
-	private boolean isPaused = false;
-	private int numLinesRemoved = 0;
-	private int curX = 0;
-	private int curY = 0;
-	private JLabel stausBar;
-	private Shape curPiece;
-	private Tetrominose[] board;
 
-	public Board(Tetris parent) {
-		// TODO Auto-generated constructor stub
-		setFocusable(true);
-		// 키 이벤트의 포커스르 받을 수 있는 컴포넌트가 여러개 있을 때 우선적으로 입력받기 위해 설정
-		curPiece = new Shape();
-		timer = new Timer(400, this);
-		stausBar = parent.getStatusBar();
-		board = new Tetrominose[BOARD_HEIGHT * BOARD_WIDTH];
-		clearBoard();
-	}
-
-	public int squareWidth() {
-		return (int) getSize().getWidth() / BOARD_WIDTH;
-	}
-
-	public int squareHeight() {
-		return (int) getSize().getHeight() / BOARD_HEIGHT;
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	public Tetrominose shapeAt(int x, int y) {
-		return board[y * BOARD_WIDTH + x];
-	}
-
-	public void clearBoard() {
-		for (int i = 0; i < BOARD_HEIGHT * BOARD_WIDTH; i++) {
-			board[i] = Tetrominose.NoShape;
+	private final int FPS = 60;
+	
+	private final int delay = 1000/FPS;
+	
+	public Board() {
+		try {
+			blocks = ImageIO.read(Board.class.getResource("/image.png"));
+			// 이미지 파일을 일거와서 BufferedImage에 넣음
+			// 관련 링크
+			// https://moogii.tistory.com/entry/JAVA-ImageIO-%ED%81%B4%EB%9E%98%EC%8A%A4%EB%A1%9C-URL%EC%9D%84-%ED%86%B5%ED%95%9C-%EC%9D%B4%EB%AF%B8%EC%A7%80-%ED%8C%8C%EC%9D%BC-%EC%A0%80%EC%9E%A5
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		
+		timer = new Timer(delay , new ActionListener() {
+			//java.swing.timer 주기적으로(delay만큼) 이벤트를 발생시킵니다. 
+			//유니티에 Update() 함수와 비슷함
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				update();
+				repaint();
+			}
+		});
+		
+		timer.start();
+
+		shapes[0] = new Shape(blocks.getSubimage(0, 0, blockSize, blockSize), new int[][] { 
+			{ 1, 1, 1, 1 } }, this); // ISHPE
+
+		shapes[1] = new Shape(blocks.getSubimage(blockSize, 0, blockSize, blockSize), new int[][] { 
+			{ 1, 1, 0 },
+			{ 0, 1, 1 }}, this); // ZSHPE
+		
+		shapes[2] = new Shape(blocks.getSubimage(blockSize*2, 0, blockSize, blockSize), new int[][] { 
+			{ 0, 1, 1 },
+			{ 1, 1, 0 }}, this); // S-SHAPE
+		
+		shapes[3] = new Shape(blocks.getSubimage(blockSize*3, 0, blockSize, blockSize), new int[][] { 
+			{ 1, 1, 1 },
+			{ 0, 0, 1 }}, this); // J-SHAP
+		
+		shapes[4] = new Shape(blocks.getSubimage(blockSize*4, 0, blockSize, blockSize), new int[][] { 
+			{ 1, 1, 1 },
+			{ 1, 0, 0 }}, this); // L-SHAP
+		
+		shapes[5] = new Shape(blocks.getSubimage(blockSize*5, 0, blockSize, blockSize), new int[][] { 
+			{ 1, 1, 1 },
+			{ 0, 1, 0 }}, this); // T-SHAP
+
+		shapes[6] = new Shape(blocks.getSubimage(blockSize*6, 0, blockSize, blockSize), new int[][] { 
+			{ 1, 1 },
+			{ 1, 1 }}, this); // O-SHAP
+		
+		currentShape = shapes[4];
+	}
+
+	
+	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
+
+		currentShape.render(g);
+		
+		for (int i = 0; i < boardHeight; i++) {
+			g.drawLine(0, i * blockSize, boardWidth * blockSize, i * blockSize);
+			// drawLine(int x1 , int y1 , int x2, int y2)
+			// 좌표(x1 , y1)에서 좌표(x2, y2)까지 직선을 그린다.
+
+			for (int j = 0; j < boardWidth; j++) {
+				g.drawLine(j * blockSize, 0, j * blockSize, blockSize * boardHeight);
+			}
+		}
+
 	}
 	
-	private void pieceDropped() {
-		for (int i = 0; i < 4; i++) {
-			int x = curX + curPiece.x(i);
-			int y = curY - curPiece.y(i);
-			board[y * BOARD_WIDTH + x] = curPiece.getShape();
+	public void update() {
+		currentShape.update();
+	}
+	
+	public int getBlockSize() {
+		return blockSize;
+	}
+
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		if(e.getKeyCode() == KeyEvent.VK_LEFT) {
+			currentShape.setDeltaX(-1);
 		}
+		if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
+			currentShape.setDeltaX(1);
+		}
+		if(e.getKeyCode() == KeyEvent.VK_DOWN) {
+			currentShape.speedDown();
+		}
+		if(e.getKeyCode() == KeyEvent.VK_UP) {
+			currentShape.rotate();
+		}
+	}
+
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		if(e.getKeyCode() == KeyEvent.VK_DOWN)
+			currentShape.normalSpeed();
+	}
+
+
+	@Override
+	public void keyTyped(KeyEvent arg0) {
+		
+		
 	}
 
 }

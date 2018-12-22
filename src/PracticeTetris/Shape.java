@@ -1,89 +1,109 @@
 package PracticeTetris;
 
-import java.util.Random;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 
 public class Shape {
 
-	enum Tetrominose {
-
-		NoShape(new int[][] { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }),
-		ZShape(new int[][] { { 0, -1 }, { 0, 0 }, { -1, 0 }, { -1, 1 } }),
-		SShape(new int[][] { { 0, -1 }, { 0, 0 }, { 1, 0 }, { 1, 1 } }),
-		LineShape(new int[][] { { 0, -1 }, { 0, 0 }, { 0, 1 }, { 0, 2 } }),
-		TShape(new int[][] { { -1, 0 }, { 0, 0 }, { 1, 0 }, { 0, 1 } }),
-		SquareShape(new int[][] { { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 } }),
-		LShape(new int[][] { { -1, -1 }, { 0, -1 }, { 0, 0 }, { 0, 1 } }),
-		MirroedShape(new int[][] { { 1, -1 }, { 0, -1 }, { 0, 0 }, { 0, 1 } });
-
-		public int[][] coords;
-
-		private Tetrominose(int[][] coords) {
-			// TODO Auto-generated constructor stub
-			
-			
-			this.coords = coords;
-		}
-	}
-
-	private Tetrominose pieceShape;
+	private BufferedImage block;
 	private int[][] coords;
+	private Board board;
+	private int deltaX = 0;
+	private int x, y;
+	private long time, lastTime;
 
-	public Shape() {
-		coords = new int[4][2];
-		setShape(Tetrominose.NoShape);
+	private int normalSpeed = 600, speedDown = 10, cuurentSpeed;
+
+	public Shape(BufferedImage block, int[][] coords, Board board) {
+		this.block = block;
+		this.coords = coords;
+		this.board = board;
+
+		cuurentSpeed = normalSpeed;
+		time = 0;
+		lastTime = 0;
+
 	}
 
-	public void setShape(Tetrominose shape) {
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 2; j++) {
-				coords[i][j] = shape.coords[i][j];
+	public void update() {
+		time += System.currentTimeMillis() - lastTime;
+		lastTime = System.currentTimeMillis();
+
+		if (!(x + deltaX + coords[0].length > 10) && !(x + deltaX < 0))
+			x += deltaX;
+
+		if (!(y + 1 + coords.length > 20)) {
+
+			if (time > cuurentSpeed) {
+				y++;
+				time = 0;
+			}
+
+		}
+
+		deltaX = 0; // 계속 증가 방지/
+
+	};
+
+	public void render(Graphics g) {
+
+		for (int row = 0; row < coords.length; row++) {
+			for (int col = 0; col < coords[row].length; col++) {
+				if (coords[row][col] != 0)
+					g.drawImage(block, col * board.getBlockSize() + x * board.getBlockSize(),
+							row * board.getBlockSize() + y * board.getBlockSize(), null);
+				// g.drawImage(IMG , X, Y , ImageObserver < 여기에 대한 자세한 설명은 없네요);
 			}
 		}
-		pieceShape = shape;
+
 	}
 
-	private void setX(int index, int x) {
-		coords[index][0] = x;
+	public void rotate() {
+		int[][] rotatedmatrix = null;
+		
+		rotatedmatrix = getTranspose(coords);
+		
+		rotatedmatrix = getReverseMatrix(rotatedmatrix);
+		
+		if(x + rotatedmatrix[0].length > 10 || y + rotatedmatrix[1].length > 20)
+			return;
+		
+		coords = rotatedmatrix;
 	}
 
-	private void setY(int index, int y) {
-		coords[index][1] = y;
-	}
+	private int[][] getTranspose(int[][] matrix) {
+		int[][] newMatrix = new int[matrix[0].length][matrix.length];
 
-	public int x(int index) {
-		return coords[index][0];
-	}
-
-	public int y(int index) {
-		return coords[index][1];
-	}
-
-	public Tetrominose getShape() {
-		return pieceShape;
-	}
-
-	public void setRandomShape() {
-		Random r = new Random();
-		int x = Math.abs(r.nextInt()) % 7 + 1;
-		Tetrominose[] values = Tetrominose.values();
-		setShape(values[x]);
-	}
-
-	public int minX() {
-		int m = coords[0][0];
-		for (int i = 0; i < 4; i++) {
-			m = Math.min(m, coords[i][0]);
+		for (int i = 0; i < matrix.length; i++) {
+			for (int j = 0; j < matrix[0].length; j++) {
+				newMatrix[j][i] = matrix[i][j];
+			}
 		}
-		return m;
+
+		return newMatrix;
 	}
-	
-	public int minY() {
-		int m = coords[0][1];
-		for (int i = 0; i < 4; i++) {
-			m = Math.min(m, coords[i][1]);
+
+	private int[][] getReverseMatrix(int[][] matrix) {
+		int middle = matrix.length / 2;
+
+		for (int i = 0; i < middle; i++) {
+			int[] m = matrix[i];
+			matrix[i] = matrix[matrix.length - i - 1];
+			matrix[matrix.length - i - 1] = m;
 		}
-		return m;
+
+		return matrix;
 	}
 
+	public void setDeltaX(int deltaX) {
+		this.deltaX = deltaX;
+	}
 
+	public void speedDown() {
+		cuurentSpeed = speedDown;
+	}
+
+	public void normalSpeed() {
+		cuurentSpeed = normalSpeed;
+	}
 }
