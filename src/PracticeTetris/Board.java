@@ -22,7 +22,7 @@ public class Board extends JPanel implements KeyListener {
 
 	private final int boardWidth = 10, boardHeight = 20;
 
-	private int[][] board = new int[boardWidth][boardHeight];
+	private int[][] board = new int[boardHeight][boardWidth];
 
 	private Shape[] shapes = new Shape[7];
 	
@@ -33,6 +33,8 @@ public class Board extends JPanel implements KeyListener {
 	private final int FPS = 60;
 	
 	private final int delay = 1000/FPS;
+	
+	private boolean gameOver = false;
 	
 	public Board() {
 		try {
@@ -59,33 +61,37 @@ public class Board extends JPanel implements KeyListener {
 		timer.start();
 
 		shapes[0] = new Shape(blocks.getSubimage(0, 0, blockSize, blockSize), new int[][] { 
-			{ 1, 1, 1, 1 } }, this); // ISHPE
+			{ 1, 1, 1, 1 } }, this , 1); // ISHPE
 
 		shapes[1] = new Shape(blocks.getSubimage(blockSize, 0, blockSize, blockSize), new int[][] { 
 			{ 1, 1, 0 },
-			{ 0, 1, 1 }}, this); // ZSHPE
+			{ 0, 1, 1 }}, this , 2); // ZSHPE
 		
 		shapes[2] = new Shape(blocks.getSubimage(blockSize*2, 0, blockSize, blockSize), new int[][] { 
 			{ 0, 1, 1 },
-			{ 1, 1, 0 }}, this); // S-SHAPE
+			{ 1, 1, 0 }}, this , 3); // S-SHAPE
 		
 		shapes[3] = new Shape(blocks.getSubimage(blockSize*3, 0, blockSize, blockSize), new int[][] { 
 			{ 1, 1, 1 },
-			{ 0, 0, 1 }}, this); // J-SHAP
+			{ 0, 0, 1 }}, this , 4); // J-SHAP
 		
 		shapes[4] = new Shape(blocks.getSubimage(blockSize*4, 0, blockSize, blockSize), new int[][] { 
 			{ 1, 1, 1 },
-			{ 1, 0, 0 }}, this); // L-SHAP
+			{ 1, 0, 0 }}, this , 5); // L-SHAP
 		
 		shapes[5] = new Shape(blocks.getSubimage(blockSize*5, 0, blockSize, blockSize), new int[][] { 
 			{ 1, 1, 1 },
-			{ 0, 1, 0 }}, this); // T-SHAP
+			{ 0, 1, 0 }}, this , 6); // T-SHAP
 
 		shapes[6] = new Shape(blocks.getSubimage(blockSize*6, 0, blockSize, blockSize), new int[][] { 
 			{ 1, 1 },
-			{ 1, 1 }}, this); // O-SHAP
+			{ 1, 1 }}, this , 7); // O-SHAP
 		
-		currentShape = shapes[4];
+		setNextShape();
+	}
+	
+	public int[][] getBoard(){
+		return board;
 	}
 
 	
@@ -93,6 +99,16 @@ public class Board extends JPanel implements KeyListener {
 		super.paintComponent(g);
 
 		currentShape.render(g);
+		
+		for (int row = 0; row < board.length; row++) {
+			for (int col = 0; col < board[row].length; col++) {
+				if(board[row][col] != 0)
+				g.drawImage(blocks.getSubimage((board[row][col]-1) * blockSize, 0, blockSize, blockSize) , col*blockSize, row*blockSize , null);
+				//생성된 블럭에서 이미지를 자름 shape에 update 메소드 참고 -1한 이유는 왼쪽에서 부터 잘라야 하기 때문에
+			}
+		}
+		//각 블럭에 shape클래스에서 변경한 값에 따라 출력을 하게 함
+		
 		
 		for (int i = 0; i < boardHeight; i++) {
 			g.drawLine(0, i * blockSize, boardWidth * blockSize, i * blockSize);
@@ -106,8 +122,31 @@ public class Board extends JPanel implements KeyListener {
 
 	}
 	
+	public void setNextShape() {
+		
+		int index = (int)(Math.random() * shapes.length);
+		
+		Shape newShape = new Shape(shapes[index].getBlock(), shapes[index].getCoords(), this , shapes[index].getColor());
+		//새로운 블럭 생성
+		
+		currentShape = newShape;
+		
+		for (int row = 0; row < currentShape.getCoords().length; row++) {
+			for (int col = 0; col < currentShape.getCoords()[row].length; col++) {
+				if(currentShape.getCoords()[row][col] != 0) { //블럭 좌표를 불러와
+					
+					if(board[row][col + 3] != 0) //시작 지점에 겹친다면
+						gameOver = true; //게임 오버
+				}
+			}
+		}
+	}
+	
 	public void update() {
 		currentShape.update();
+		
+		if(gameOver)
+			timer.stop();
 	}
 	
 	public int getBlockSize() {
