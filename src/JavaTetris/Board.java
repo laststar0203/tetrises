@@ -12,19 +12,25 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+
+
 //JLabel은 개행문자 즉 줄바꿈을 할 수 없음
 
 public class Board extends JPanel implements KeyListener {
 
 	private final int HEIGHT = 10, WIDTH = 20;
-	public static final int[][] board = new int[10][20];
+	public static int[][] board = new int[10][20];
 	private Timer timer;
-	private final int FPS = 60;
+	private final int FPS = 1;
 	private final int delay = 1000 / FPS;
 
+	private Shape[] shapes = new Shape[7];
+	
 	private JLabel window;
 
 	private Score score;
+
+	private Shape currentBoard;
 
 	public Board(Score score) {
 
@@ -38,11 +44,50 @@ public class Board extends JPanel implements KeyListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				printScreen();
+				update();
 			}
 		});
 		timer.start();
+		
+		shapes[0] = new Shape(new int[][] { 
+			{ 1, 1, 1, 1 } } , this); // ISHPE
 
+		shapes[1] = new Shape( new int[][] { 
+			{ 1, 1, 0 },
+			{ 0, 1, 1 }} , this); // ZSHPE
+		
+		shapes[2] = new Shape( new int[][] { 
+			{ 0, 1, 1 },
+			{ 1, 1, 0 }} , this); // S-SHAPE
+		
+		shapes[3] = new Shape(new int[][] { 
+			{ 1, 1, 1 },
+			{ 0, 0, 1 }} , this); // J-SHAP
+		
+		shapes[4] = new Shape( new int[][] { 
+			{ 1, 1, 1 },
+			{ 1, 0, 0 }} , this); // L-SHAP
+		
+		shapes[5] = new Shape( new int[][] { 
+			{ 1, 1, 1 },
+			{ 0, 1, 0 }} , this); // T-SHAP
+
+		shapes[6] = new Shape(new int[][] { 
+			{ 1, 1 },
+			{ 1, 1 }}, this); // O-SHAP
+		
+		
+		currentBoard = shapes[2];
+		
+
+	}
+
+	public int getHEIGHT() {
+		return HEIGHT;
+	}
+
+	public int getWIDTH() {
+		return WIDTH;
 	}
 
 	private void printScreen() {
@@ -66,6 +111,12 @@ public class Board extends JPanel implements KeyListener {
 																														// html을
 																														// 이용해
 																														// 주어야한다.
+	}
+
+	private void update() {
+
+		currentBoard.update();
+		printScreen();
 	}
 
 	@Override
