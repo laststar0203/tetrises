@@ -67,6 +67,14 @@ public class Score {
 
 	}
 
+	public int getScore() {
+		return score;
+	}
+
+	public void setScore(int score) {
+		this.score = score;
+	}
+
 	public void saveScore() throws Exception {
 		File file = new File(path);
 		if (file.exists())

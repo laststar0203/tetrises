@@ -24,6 +24,8 @@ public class Main extends JFrame {
 
 		add(scoreText, BorderLayout.NORTH);
 		getContentPane().add(board, BorderLayout.CENTER); // 상속으로 Jpanel를 만들었을때만
+		addKeyListener(board);
+		
 
 		setVisible(true);
 

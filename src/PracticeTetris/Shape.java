@@ -48,6 +48,8 @@ public class Shape {
 		time += System.currentTimeMillis() - lastTime;
 		lastTime = System.currentTimeMillis();
 
+		System.out.println(time + " : "+ lastTime);
+		
 		if (collision) {
 
 			for (int row = 0; row < coords.length; row++) {
