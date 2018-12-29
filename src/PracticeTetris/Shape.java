@@ -195,7 +195,6 @@ public class Shape {
 
 				if (board.getBoard()[i][j] != 0)
 					count++;
-
 				board.getBoard()[height][j] = board.getBoard()[i][j];
 				// height 변수 값에 변화가 있으면 가장 바깥 반복문에 i 값과 같아 변화가 없지만 변화가 없다면 값이 달라(변수 height 값이 큼)
 				// 뒤 바뀜이 일어나게 됨

@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JTextField;
 
 public class Main extends JFrame {
 
@@ -17,12 +18,13 @@ public class Main extends JFrame {
 
 		setLayout(new BorderLayout());
 
-		JLabel scoreText = new JLabel();
+		JLabel scoreBox = new JLabel("0점");
+		
 
-		Score score = new Score(scoreText);
+		Score score = new Score(scoreBox);
 		Board board = new Board(score);
 
-		add(scoreText, BorderLayout.NORTH);
+		add(scoreBox, BorderLayout.NORTH);
 		getContentPane().add(board, BorderLayout.CENTER); // 상속으로 Jpanel를 만들었을때만
 		addKeyListener(board);
 		

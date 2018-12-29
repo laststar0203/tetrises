@@ -23,48 +23,54 @@ public class Score {
 
 	private JLabel scoreBox;
 	private int score;
-	public HashMap<String, Integer> playerScores;
+	public HashMap<String, Integer> playerScores = new HashMap<String, Integer>();
 	String path;
 
 	public Score(JLabel scoreBox) {
 		this.scoreBox = scoreBox;
+	
 
 	}
 
-	public void loadScore() throws Exception {
-		File directory = new File(getDefultDirectory(), "/Tetirs");
-		if (directory.exists()) {
-			directory.mkdirs();
-		}
-		File file = new File(directory, "/socre.text");
-
+	public String loadScore() throws Exception {
+		File file = new File(path);
+		if (file.exists())
+			file.createNewFile();
+		
+		
 		path = file.getPath();
 
-		if (file.exists()) {
-			file.createNewFile();
-			System.out.println("File is net found saving defualts");
-		}
-
+		
 		Scanner s = new Scanner(file);
 
 		playerScores = new HashMap<String, Integer>();
-
+		try {
 		while (s.hasNextLine()) {
 			String[] code = s.nextLine().split(":");
 			playerScores.put(code[0], Integer.parseInt(code[1]));
 		}
-
-		Iterator<String> i = sortByValue(playerScores).iterator();
-
-		String scoreText = null;
-
-		for (int j = 0; j < 5; j++) {
-			StringBuilder sb = new StringBuilder(scoreText);
-			sb.append(i + "´Ô    " + playerScores.get(i) + "\n");
+		}catch (NumberFormatException e) {
+			for (int i = 0; i < 5; i++) {
+				playerScores.put("AAA" ,0);
+			}
+	
+			
 		}
 
-		scoreBox.setText(scoreText);
+		Iterator<Integer> i = sortByValue(playerScores).iterator();
 
+		
+		StringBuilder sb = new StringBuilder();
+		
+		for (int j = 0; j < 5; j++) {
+			//sb.append(playerScores.getk "´Ô    " + i.next() + "\n");
+		}
+		
+		
+		
+		return "´ç½ÅÀÇ Á¡¼ö´Â!! :"+getScore()+"\n"+sb.toString();
+		
+		
 	}
 
 	public int getScore() {
@@ -72,13 +78,26 @@ public class Score {
 	}
 
 	public void setScore(int score) {
-		this.score = score;
+		this.score += score;
+		scoreBox.setText(this.score + "Á¡");
 	}
 
-	public void saveScore() throws Exception {
-		File file = new File(path);
-		if (file.exists())
+	public void saveScore(String name , int score) throws Exception {
+		
+		File directory = new File(getDefultDirectory(), "/Tetirs");
+		if (!directory.exists()) {
+			directory.mkdirs();
+		}
+		File file = new File(directory, "/socre.text");
+		if (!file.exists()) {
 			file.createNewFile();
+			System.out.println("File is net found saving defualts");
+		}
+
+
+		path = file.getPath();
+		
+		playerScores.put(name ,  score);
 
 		PrintWriter pw = new PrintWriter(file);
 
@@ -92,10 +111,11 @@ public class Score {
 
 	}
 
-	public static ArrayList<String> sortByValue(final Map<String, Integer> map) {
-		ArrayList<String> list = new ArrayList<String>();
-		list.addAll(map.keySet());
+	public static ArrayList<Integer> sortByValue(final Map<String, Integer> map) {
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		list.addAll(map.values());
 
+		
 		Collections.sort(list, (o1, o2) -> {
 			Object v1 = map.get(o1);
 			Object v2 = map.get(o2);
